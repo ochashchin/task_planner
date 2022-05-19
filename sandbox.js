@@ -4,6 +4,18 @@ const timeEdit = document.getElementById("formTime");
 const activityEdit = document.getElementById("formActivity");
 const submitBtn = document.getElementById("submit");
 
+const deleteData = (id) => {
+    db.collection('tasks').doc(id).delete()
+        .then(
+            () => {
+                getData();
+            })
+        .catch(
+            err => {
+                console.log(err);
+            });
+};
+
 const getData = () => {
     db.collection('tasks').get()
         .then(
@@ -34,10 +46,25 @@ const showTasks = (tasks) => {
     }
     tasks.forEach(task => {
         let li = document.createElement('li');
+        li.className = "slide-fade";
         li.textContent = `${task.data().action} ${task.data().time}`;
-        ul.appendChild(li);
+        let btn = document.createElement('button');
+        btn.className = "btn btn-danger btn-sm my-2";
+        btn.textContent = "delete"
+        btn.style.minWidth = "100px";
+        btn.setAttribute("data-id", task.id);
+        ul.append(li, btn);
     });
+    onClickTask();
 };
+
+const onClickTask = () => {
+    ul.addEventListener("click", ev => {
+        if (ev.target.tagName === 'BUTTON') {
+            deleteData(ev.target.getAttribute("data-id"));
+        }
+    });
+}
 
 let eventList = ["keypress", "click"];
 
